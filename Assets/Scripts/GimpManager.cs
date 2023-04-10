@@ -45,7 +45,6 @@ public class GimpManager : MonoBehaviour
         if (currentGimp < maxGimp) {
             if (gimpRechargeTimer <= 0) {
                 if (!gimpCharging) gimpCharging = true;
-                Debug.Log(gimpCharging);
                 currentGimp++;
                 updateGimpMeter = true;
                 gimpRechargeTimer = gimpRechargeTime;
