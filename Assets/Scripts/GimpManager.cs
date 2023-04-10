@@ -19,6 +19,13 @@ public class GimpManager : MonoBehaviour
     [SerializeField]
     float gimpContainerPadding;
 
+    [SerializeField]
+    float gimpRechargeTime;
+    float gimpRechargeTimer;
+    [SerializeField]
+    float gimpRechargeDelay;
+    bool gimpCharging;
+
     private void Start() {
         updateGimpMeter = true;
     }
@@ -33,12 +40,24 @@ public class GimpManager : MonoBehaviour
 
             gimpMeterContainer.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, 10 * maxGimp + gimpContainerPadding);
 
-            Debug.Log(currentGimp);
             updateGimpMeter = false;
+        }
+        if (currentGimp < maxGimp) {
+            if (gimpRechargeTimer <= 0) {
+                if (!gimpCharging) gimpCharging = true;
+                Debug.Log(gimpCharging);
+                currentGimp++;
+                updateGimpMeter = true;
+                gimpRechargeTimer = gimpRechargeTime;
+            } else {
+                gimpRechargeTimer -= Time.deltaTime;
+            }
         }
     }
 
     public bool SpendGimp(int value) {
+        gimpCharging = false;
+        gimpRechargeTimer = gimpRechargeDelay;
         if (currentGimp >= value) {
             currentGimp -= value;
             updateGimpMeter = true;
