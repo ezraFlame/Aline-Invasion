@@ -7,6 +7,7 @@ public class PlayerController : MonoBehaviour
     // References
 	Rigidbody2D rb;
     PlayerInput input;
+    GimpManager gimpManager;
 
     // Movement
 	[SerializeField]
@@ -41,6 +42,8 @@ public class PlayerController : MonoBehaviour
     Vector2 startScale;
     [SerializeField]
     Vector2 scaleAmount;
+    [SerializeField]
+    int jumpChargeCost;
 
     // Stomping
     [SerializeField]
@@ -55,16 +58,13 @@ public class PlayerController : MonoBehaviour
     int stompDamage;
     [SerializeField]
     float stompRadius;
-
-    // GIMP Charges
     [SerializeField]
-    int currentGimp;
-    [SerializeField]
-    int maxGimp;
+    int stompCost;
 
 	private void Awake() {
 		rb = GetComponent<Rigidbody2D>();
         input = GetComponent<PlayerInput>();
+        gimpManager = GetComponent<GimpManager>();
 	}
 
 	private void Start() {
@@ -100,7 +100,7 @@ public class PlayerController : MonoBehaviour
 	
         if (input.actions["Stomp"].WasPressedThisFrame() && !grounded)
         {
-            if (!Physics2D.Raycast(feet.position, Vector2.down, stompCheckDistance, walkMask))
+            if (!Physics2D.Raycast(feet.position, Vector2.down, stompCheckDistance, walkMask) && gimpManager.SpendGimp(stompCost))
                 StartCoroutine(Stomp());
         }
     }
@@ -119,13 +119,13 @@ public class PlayerController : MonoBehaviour
         {
             float yVelocity = jumpSpeed;
 
-            if (jumpChargeCounter > jumpChargeTime * 0.25f)
+            if (jumpChargeCounter > jumpChargeTime * 0.25f && gimpManager.SpendGimp(jumpChargeCost))
             {
                 yVelocity += jumpChargeCounter / jumpChargeTime * jumpChargeModifier;
-                jumpChargeCounter = 0;
             }
             rb.velocity = new Vector2(rb.velocity.x, yVelocity);
             jumpBufferCounter = 0;
+            jumpChargeCounter = 0;
 		}   
 	}
 
